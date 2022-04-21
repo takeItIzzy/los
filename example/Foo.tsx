@@ -1,15 +1,19 @@
 import * as React from 'react';
-import { useLosValue } from '../src/store';
+import { useSetLosState } from '../src/store';
 import { state } from './store';
 
 const Foo = () => {
-  const myState = useLosValue(state);
+  const setState = useSetLosState(state);
 
   return (
-    <div>
-      {myState}
+    <div
+      onClick={() => {
+        setState(3);
+      }}
+    >
+      child
     </div>
-  )
+  );
 };
 
 export default Foo;
