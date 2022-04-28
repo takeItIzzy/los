@@ -1,4 +1,4 @@
-# los
+# losjs
 
 一个原子化的状态管理工具。
 
@@ -27,7 +27,7 @@ los 的原子化概念灵感来自 recoil，recoil 是个很好的状态管理�
 ## 安装
 
 ```
-npm i los
+npm i losjs
 ```
 
 ## 快速上手
@@ -38,33 +38,33 @@ npm i los
 const myState = atom(0);
 ```
 
-如果你的状态默认值不依赖于网络请求等场景，使用 atom 就初始化好了一个原子状态了，但如果你希望默认值在未来某个时间才确定，你可以在需要的时候调用 `init`：
+如果你的状态默认值不依赖于网络请求等场景，使用 atom 就初始化好了一个原子状态了，但如果你希望默认值在未来某个时间才确定，你可以在需要的时候调用 `initLosState`：
 
 ```js
 function Foo() {
   ...
   const fetchData = async () => {
     const response = await fetch(...);
-    init(myState, response);
+    initLosState(myState, response);
   };
   ...
 };
 ```
 
-init() 默认仅会执行一次，后续再对同一个原子状态执行 init 则不会更新状态，想改变这一默认行为，可以传入第三个参数，这是一个布尔值，决定是否允许重复初始化，默认为 false：
+initLosState() 默认仅会执行一次，后续再对同一个原子状态执行 init 则不会更新状态，想改变这一默认行为，可以传入第三个参数，这是一个布尔值，决定是否允许重复初始化，默认为 false：
 ```js
-init(myState, defaultValue, true);
+initLosState(myState, defaultValue, true);
 ```
 
-init 也提供了对应的 hooks，这在你想将数据的初始化隔离到特定组件或自定义 hooks 中时很有用。`useLosInit` 行为类似 `useState`，接受默认值，并返回状态与改变状态的 setter 方法：
+initLosState 也提供了对应的 hooks，这在你想将数据的初始化隔离到特定组件或自定义 hooks 中时很有用。`useInitLosState` 行为类似 `useState`，接受默认值，并返回状态与改变状态的 setter 方法：
 
 ```js
 function Foo({ defaultValue }) {
-  const [state, setState] = useLosInit(myState, defaultValue);
+  const [state, setState] = useInitLosState(myState, defaultValue);
 };
 ```
 
-注意：init 和 useLosInit 并不是必要的，如果你的初始状态在使用 atom 生成原子状态时就可以确定，那就不需要使用它俩。
+注意：initLosState 和 useInitLosState 并不是必要的，如果你的初始状态在使用 atom 生成原子状态时就可以确定，那就不需要使用它俩。
 
 使用状态也类似 useState：
 

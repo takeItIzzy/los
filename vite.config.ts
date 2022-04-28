@@ -15,8 +15,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, './src/index.ts'),
-      name: 'los',
-      fileName: (format) => `los.${format}.js`,
+      name: 'losjs',
+      fileName: (format) => `losjs.${format}.js`,
     },
     rollupOptions: {
       external: ['react', 'react-dom'],

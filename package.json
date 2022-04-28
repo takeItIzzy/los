@@ -1,15 +1,14 @@
 {
-  "name": "los",
-  "private": true,
-  "version": "0.0.0",
+  "name": "losjs",
+  "version": "0.1.0",
   "files": ["dist"],
-  "main": "./dist/los.umd.js",
-  "module": "./dist/los.es.js",
-  "types": "./dist/los.d.ts",
+  "main": "./dist/losjs.umd.js",
+  "module": "./dist/losjs.es.js",
+  "types": "./dist/losjs.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/los.es.js",
-      "require": "./dist/los.umd.js"
+      "import": "./dist/losjs.es.js",
+      "require": "./dist/losjs.umd.js"
     }
   },
   "scripts": {
