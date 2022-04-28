@@ -30,7 +30,7 @@ export const atom = <T>(state: T): Atom<T> => {
   return atomItem;
 };
 
-export const useLosValue = <T>(atom: Atom<T>) => {
+export const useLosValue = <T>(atom: Atom<T>): T => {
   const [id] = React.useState(Symbol());
 
   React.useEffect(() => {
@@ -49,7 +49,8 @@ export const useLosValue = <T>(atom: Atom<T>) => {
 };
 
 type SetStateFunction<T> = (state: T) => T;
-export const useSetLosState = <T>(atom: Atom<T>) => {
+type SetLosState<T> = (state: T | SetStateFunction<T>) => void;
+export const useSetLosState = <T>(atom: Atom<T>): SetLosState<T> => {
   return (state: T | SetStateFunction<T>) => {
     store.set(atom, {
       // @ts-ignore
@@ -65,11 +66,15 @@ export const useSetLosState = <T>(atom: Atom<T>) => {
   };
 };
 
-export const useLosState = <T>(atom: Atom<T>) => {
+export const useLosState = <T>(atom: Atom<T>): [T, SetLosState<T>] => {
   return [useLosValue(atom), useSetLosState(atom)];
 };
 
-export const initLosState = <T>(state: Atom<T>, defaultValue: T, allowReinitialize?: boolean) => {
+export const initLosState = <T>(
+  state: Atom<T>,
+  defaultValue: T,
+  allowReinitialize?: boolean
+): void => {
   if (allowReinitialize) {
     store.set(state, { hasInit: true, value: defaultValue, stateBucket: new Map() });
     // @ts-ignore
@@ -87,7 +92,11 @@ export const initLosState = <T>(state: Atom<T>, defaultValue: T, allowReinitiali
   }
 };
 
-export const useInitLosState = <T>(atom: Atom<T>, defaultValue: T, allowReinitialize?: boolean) => {
+export const useInitLosState = <T>(
+  atom: Atom<T>,
+  defaultValue: T,
+  allowReinitialize?: boolean
+): [T, SetLosState<T>] => {
   initLosState(atom, defaultValue, allowReinitialize);
 
   return [useLosValue(atom), useSetLosState(atom)];

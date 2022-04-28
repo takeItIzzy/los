@@ -2,9 +2,19 @@
   "name": "los",
   "private": true,
   "version": "0.0.0",
+  "files": ["dist"],
+  "main": "./dist/los.umd.js",
+  "module": "./dist/los.es.js",
+  "types": "./dist/los.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/los.es.js",
+      "require": "./dist/los.umd.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build && tsc --declaration --emitDeclarationOnly --outDir ./dist",
     "preview": "vite preview"
   },
   "dependencies": {
