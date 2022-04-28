@@ -6,10 +6,10 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
  * useLosValue triggers component re-rendering when state updated.
  */
 
-const store: WeakMap<
+const store: Map<
   Atom<any>,
   { hasInit: boolean; value: any; stateBucket?: Map<symbol, () => void> }
-> = new WeakMap();
+> = new Map();
 
 class Atom<T> {
   constructor(value: T) {
@@ -19,19 +19,19 @@ class Atom<T> {
 }
 
 export const atom = <T>(state: T): Atom<T> => {
-  return new Atom<T>(state);
+  const atomItem = new Atom(state);
+
+  store.set(atomItem, {
+    hasInit: false,
+    value: atomItem.value,
+    stateBucket: new Map(),
+  });
+
+  return atomItem;
 };
 
 export const useLosValue = <T>(atom: Atom<T>) => {
   const [id] = React.useState(Symbol());
-
-  if (!store.has(atom)) {
-    store.set(atom, {
-      hasInit: false,
-      value: atom.value,
-      stateBucket: new Map(),
-    });
-  }
 
   React.useEffect(() => {
     return () => {
@@ -42,7 +42,7 @@ export const useLosValue = <T>(atom: Atom<T>) => {
 
   return useSyncExternalStore(
     // @ts-ignore
-    (l) => () => store.get(atom).stateBucket.set(id, l),
+    (subscribeFn) => () => store.get(atom).stateBucket.set(id, subscribeFn),
     // @ts-ignore
     () => store.get(atom).value
   );
@@ -50,13 +50,10 @@ export const useLosValue = <T>(atom: Atom<T>) => {
 
 type SetStateFunction<T> = (state: T) => T;
 export const useSetLosState = <T>(atom: Atom<T>) => {
-  if (!store.has(atom)) {
-    store.set(atom, { hasInit: false, value: atom.value, stateBucket: new Map() });
-  }
-
   return (state: T | SetStateFunction<T>) => {
     store.set(atom, {
-      hasInit: false,
+      // @ts-ignore
+      hasInit: store.get(atom).stateBucket ?? false,
       // @ts-ignore
       value: typeof state === 'function' ? state(store.get(atom).value) : state,
       // @ts-ignore
@@ -73,22 +70,20 @@ export const useLosState = <T>(atom: Atom<T>) => {
 };
 
 export const initLosState = <T>(state: Atom<T>, defaultValue: T, allowReinitialize?: boolean) => {
-  if (!store.has(state) || allowReinitialize) {
+  if (allowReinitialize) {
     store.set(state, { hasInit: true, value: defaultValue, stateBucket: new Map() });
     // @ts-ignore
     store.get(state).stateBucket.forEach((fn) => fn());
-  } else if (store.has(state)) {
     // @ts-ignore
-    if (!store.get(state).hasInit) {
-      store.set(state, {
-        hasInit: true,
-        value: defaultValue,
-        // @ts-ignore
-        stateBucket: store.get(state).stateBucket ?? new Map(),
-      });
+  } else if (!store.get(state).hasInit) {
+    store.set(state, {
+      hasInit: true,
+      value: defaultValue,
       // @ts-ignore
-      store.get(state).stateBucket.forEach((fn) => fn());
-    }
+      stateBucket: store.get(state).stateBucket ?? new Map(),
+    });
+    // @ts-ignore
+    store.get(state).stateBucket.forEach((fn) => fn());
   }
 };
 
