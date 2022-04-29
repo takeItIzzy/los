@@ -1,10 +1,10 @@
 {
   "name": "losjs",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "files": ["dist"],
   "main": "./dist/losjs.umd.js",
   "module": "./dist/losjs.es.js",
-  "types": "./dist/losjs.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/losjs.es.js",
