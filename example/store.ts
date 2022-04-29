@@ -1,3 +1,5 @@
-import { atom } from '../src/store';
+import { atom, LosReducer } from '../src';
 
-export const state = atom(11)
+export const state = atom({
+  defaultValue: 0,
+});

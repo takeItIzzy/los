@@ -1,8 +1,8 @@
 import { state } from './store';
-import { useLosState } from '../src/store';
+import { useLosState } from '../src';
 import Foo from './Foo';
 import Boo from './Boo';
-import React from 'react';
+import * as React from 'react';
 
 const App = () => {
   const [myState, setMyState] = useLosState(state);

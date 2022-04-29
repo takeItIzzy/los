@@ -32,10 +32,12 @@ npm i losjs
 
 ## 快速上手
 
-先使用 `atom` 声明一个原子状态，参数为状态的默认值：
+先使用 `atom` 声明一个原子状态：
 
 ```js
-const myState = atom(0);
+const myState = atom({
+  defaultValue: 0
+});
 ```
 
 如果你的状态默认值不依赖于网络请求等场景，使用 atom 就初始化好了一个原子状态了，但如果你希望默认值在未来某个时间才确定，你可以在需要的时候调用 `initLosState`：

@@ -7,23 +7,39 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
  */
 
 const store: Map<
-  Atom<any>,
-  { hasInit: boolean; value: any; stateBucket?: Map<symbol, () => void> }
+  Atom<any, any>,
+  {
+    hasInit: boolean;
+    value: any;
+    reducer?: LosReducer<any, any>;
+    stateBucket?: Map<symbol, () => void>;
+  }
 > = new Map();
 
-class Atom<T> {
-  constructor(value: T) {
+export type LosAction<T> = { type: T; [key: string]: any };
+export type LosReducer<S, A> = (state: S, action: LosAction<A>) => S;
+class Atom<T, A = void> {
+  constructor(value: T, reducer?: LosReducer<T, A>) {
     this.value = value;
+    this.reducer = reducer;
   }
   value: T;
+  reducer?: LosReducer<T, A>;
 }
 
-export const atom = <T>(state: T): Atom<T> => {
-  const atomItem = new Atom(state);
+export const atom = <T, A = void>({
+  defaultValue,
+  reducer,
+}: {
+  defaultValue: T;
+  reducer?: LosReducer<T, A>;
+}): Atom<T, A> => {
+  const atomItem = new Atom(defaultValue, reducer);
 
   store.set(atomItem, {
     hasInit: false,
     value: atomItem.value,
+    reducer: atomItem.reducer,
     stateBucket: new Map(),
   });
 

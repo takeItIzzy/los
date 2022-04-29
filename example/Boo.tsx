@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { initLosState } from '../src/store';
+import { initLosState } from '../src';
 import { state } from './store';
 
 const Boo = () => {
