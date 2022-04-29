@@ -3,15 +3,13 @@
  * useLosValue triggers component re-rendering when state updated.
  */
 
-export const store: Map<
-  Atom<any, any>,
-  {
-    hasInit: boolean;
-    value: any;
-    reducer?: LosReducer<any, any>;
-    stateBucket?: Map<symbol, () => void>;
-  }
-> = new Map();
+export interface StoreItem {
+  hasInit: boolean;
+  value: any;
+  reducer?: LosReducer<any, any>;
+  stateBucket?: Map<symbol, () => void>;
+}
+export const store: Map<Atom<any, any>, StoreItem> = new Map();
 
 export type LosAction<T> = { type: T; [key: string]: any };
 export type LosReducer<S, A> = (state: S, action: LosAction<A>) => S;

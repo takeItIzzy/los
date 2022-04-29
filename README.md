@@ -40,7 +40,130 @@ const myState = atom({
 });
 ```
 
-如果你的状态默认值不依赖于网络请求等场景，使用 atom 就初始化好了一个原子状态了，但如果你希望默认值在未来某个时间才确定，你可以在需要的时候调用 `initLosState`：
+通过 `useLosState` hook 使用该状态，`useLosState` 的行为与 `React.useState` 类似，接受一个新值或返回新值的回调函数：
+
+```js
+const Foo = () => {
+  const [state, setState] = useLosState(myState);
+  
+  return (
+    <>
+      <div>counts: {state}</div>
+      <button onClick={() => setState(prev => prev + 1)}>Increase</button>
+    </>
+  );
+};
+```
+
+## APIs
+
+### atom
+
+`atom` 方法可以在 los 内注册一个原子状态，该方法接受一个如下类型的对象：
+
+```typescript
+{
+  defaultValue: T;
+  reducer?: LosReducer<T, A>;
+}
+```
+
+`defaultValue` 作为该原子状态的默认值，`reducer` 则是可选的，它类似 `React.useReducer` 的第一个参数，接受一个返回新值的 reducer 函数：
+
+```js
+const myState = atom({
+  defaultValue: 0,
+  reducer: (state, action) => {
+    switch (action.type) {
+      case 'INCREMENT':
+        return state + 1;
+      default:
+        return state;
+    }
+  },
+});
+```
+
+los 认为一个状态的改变途径可以在声明该状态时就确定，所以将 reducer 放在了 atom 中。
+
+### useLosState
+
+`useLosState` 接受由 `atom` 方法返回的原子状态作为参数，返回该状态的最新值以及更新该状态的 setter 方法：
+
+```js
+const Foo = () => {
+  const [state, setState] = useLosState(myState);
+
+  return (
+    <>
+      <div>new value: {state}</div>
+      <button onClick={() => setState(1)}>Click me</button>
+      <button onClick={() => setState(prev => prev + 1)}>Inrease</button>
+    </>
+  );
+};
+```
+
+### useLosValue & useSetLosState
+
+如果你仅在某个组件中使用而不需要设置一个状态，可以使用 `useLosValue`，它将仅返回状态的新值：
+
+```js
+const Foo = () => {
+  const state = useLosValue(myState);
+  
+  return <div>{state}</div>
+};
+```
+
+如果你仅在某个组件中设置而不需要使用一个状态，可以使用 `useSetLosState`，它将仅返回更新状态的 setter 方法：
+
+```js
+const Foo = () => {
+  const setState = useSetLosState(myState);
+  
+  return <button onClick={() => setState(1)}>Update state</button>
+};
+```
+
+事实上，在 los 内部，`useLosState` 就是由 `useLosValue` 和 `useSetLosState` 组成的，`useLosState` 方法返回的就是 `[useLosValue(myState), useSetLosState(myState)]`。
+
+### useLosReducer
+
+`useLosReducer` 接受一个声明了 `reducer` 属性的由 `atom` 方法生成的原子状态，它的行为类似 `React.useReducer`，返回一个该状态的最新值和一个用于改变该状态的 dispatch 方法：
+
+```js
+const myState = atom({
+  defaultValue: 0;
+  reducer: (state, action) => {
+    switch (action.type) {
+      case 'INCREMENT':
+        return state + action.step ?? 1;
+      default:
+        return state;
+    }
+  };
+});
+
+const Foo = () => {
+  const [state, dispatch] = useLosReducer(myState);
+  
+  return (
+    <>
+      <div>Counts: {state}</div>
+      <button onClick={() => dispatch({ type: 'INCREMENT', step: 2 })}>Increase</button>
+    </>
+  );
+};
+```
+
+如果你的状态无法在使用 `atom` 声明状态时确认，`useLosReducer` 还接受第二个参数，用于在调用 useLosReducer 时再初始化状态：
+
+todo
+
+### initLosState & useInitLosState
+
+如果你的状态默认值不依赖于网络请求等场景，使用 atom 就初始化好了一个原子状态了，但如果你的默认值在未来某个时间才确定，你可以在需要的时候调用 `initLosState`：
 
 ```js
 function Foo() {
@@ -67,9 +190,3 @@ function Foo({ defaultValue }) {
 ```
 
 注意：initLosState 和 useInitLosState 并不是必要的，如果你的初始状态在使用 atom 生成原子状态时就可以确定，那就不需要使用它俩。
-
-使用状态也类似 useState：
-
-```js
-const [state, setState] = useLosState(myState);
-```

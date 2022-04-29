@@ -1,14 +1,12 @@
 import { state } from './store';
-import { useLosState } from '../src';
+import { useLosReducer } from '../src';
 import Foo from './Foo';
 import Boo from './Boo';
 import * as React from 'react';
 
 const App = () => {
-  const [myState, setMyState] = useLosState(state);
+  const [myState, dispatch] = useLosReducer(state);
   const [myState2, setMyState2] = React.useState(0);
-
-  console.log(myState);
 
   React.useEffect(() => {
     console.log('re-render', myState);
@@ -16,7 +14,7 @@ const App = () => {
 
   return (
     <div>
-      <div onClick={() => setMyState(4)}>{myState}</div>
+      <div onClick={() => dispatch({ type: 'INCREMENT' })}>{myState}</div>
       <div onClick={() => setMyState2(5)}>{myState2}</div>
       <Foo />
       <Boo />
