@@ -1,6 +1,13 @@
 {
   "name": "losjs",
-  "version": "0.3.1",
+  "description": "An atomic react state management library",
+  "author":  {
+    "name": "take_it_Izzy",
+    "email": "q1367257497@gmail.com"
+  },
+  "version": "0.3.2",
+  "keywords": ["react", "state", "manager", "management", "recoil", "store", "useContext"],
+  "license": "MIT",
   "files": ["dist"],
   "main": "./dist/losjs.umd.js",
   "module": "./dist/losjs.es.js",
