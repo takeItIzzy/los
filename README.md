@@ -63,12 +63,12 @@ const Foo = () => {
 
 ```typescript
 {
-  defaultValue: T;
+  defaultValue?: T;
   reducer?: LosReducer<T, A>;
 }
 ```
 
-`defaultValue` 作为该原子状态的默认值，`reducer` 则是可选的，它类似 `React.useReducer` 的第一个参数，接受一个返回新值的 reducer 函数：
+`defaultValue` 作为该原子状态的默认值，`reducer` 类似 `React.useReducer` 的第一个参数，接受一个返回新值的 reducer 函数：
 
 ```js
 const myState = atom({
@@ -157,9 +157,39 @@ const Foo = () => {
 };
 ```
 
-如果你的状态无法在使用 `atom` 声明状态时确认，`useLosReducer` 还接受第二个参数，用于在调用 useLosReducer 时再初始化状态：
+如果你的状态无法在使用 `atom` 声明状态时确认，`useLosReducer` 还接受第二个参数，用于在调用 useLosReducer 时再初始化状态。在使用 `atom` 时不需要指定 `defaultValue`：
 
-todo
+```js
+const stateWithoutDefault = atom({});
+
+const Foo = () => {
+  const [state, dispatch] = useLosReducer(stateWithoutDefault, 0);
+  
+  return <div>{state}</div>; // should be `0`
+};
+```
+
+初始化状态默认仅会执行一次，如果传入的第二个参数是个变量，即使后面其值变更，也不会生效。想改变这一默认行为，可以传入第三个参数，这是一个布尔值，决定是否允许重新初始化，默认为 `false`。通常你不需要这样做，这可能会导致状态管理变得混乱，你更应该使用 `dispatch` 来更新状态，这个参数只是多一种选择：
+
+```js
+const Foo = ({ value }) => {
+  const [state, dispatch] = useLosReducer(stateWithoutDefault, value, true); // everytime `value` changes, it'll update state.
+  
+  return ...
+};
+```
+
+### useLosDispatch
+
+就像 `useLosState` 是由 `useLosValue` 和 `useSetLosState` 组合而成的一样，`useLosReducer` 是由 `useLosValue` 和 `useLosDispatch` 组合而成的。你可以根据实际情况调用 `useLosValue` 和 `useLosDispatch` 来仅在一个组件内使用或更新状态：
+
+```js
+const Foo = () => {
+  const dispatch = useLosDispatch(myState);
+  
+  return <button onClick={() => dispatch({ type: "INCREMENT" })}>Update state</button>
+};
+```
 
 ### initLosState & useInitLosState
 
@@ -170,13 +200,13 @@ function Foo() {
   ...
   const fetchData = async () => {
     const response = await fetch(...);
-    initLosState(myState, response);
+    initLosState(myState, response.data);
   };
   ...
 };
 ```
 
-initLosState() 默认仅会执行一次，后续再对同一个原子状态执行 init 则不会更新状态，想改变这一默认行为，可以传入第三个参数，这是一个布尔值，决定是否允许重复初始化，默认为 false：
+与在 `useLosReducer` 中初始化状态类似，initLosState() 默认仅会执行一次，后续再对同一个原子状态执行 initLosState 则不会更新状态，想改变这一默认行为，可以传入第三个参数，这是一个布尔值，决定是否允许重复初始化，默认为 false：
 ```js
 initLosState(myState, defaultValue, true);
 ```
@@ -189,4 +219,43 @@ function Foo({ defaultValue }) {
 };
 ```
 
+#### 未初始化时数据的表现形式
+
+当一个状态还没有初始化完成时，其返回的状态也是 `atom` 中的 `defaultValue`，如果这时你没有设置 defaultValue，那 los 将返回 undefined：
+
+```js
+const Foo = () => {
+  const state = useLosValue(myState);
+  
+  if (state == undefined) { // `==` will determine whether it is nil
+    return <Loader />
+  }
+  
+  return <div>{state}</div>
+};
+```
+
 注意：initLosState 和 useInitLosState 并不是必要的，如果你的初始状态在使用 atom 生成原子状态时就可以确定，那就不需要使用它俩。
+
+### TypeScript
+
+每个 API 都可以通过泛型约定状态及 actions 的类型，其中 actions 类型是可选的：
+
+```typescript
+const myState = atom<number>({ defaultValue: 0 });
+type Actions = 'INCREMENT' | 'DECREMENT';
+const myStateWithReducer = atom<number, Actions>({ defaultValue: 0, reducer: ... });
+
+const Foo = () => {
+  const state = useLosValue<number>(myState);
+  const stateWithReducer = useLosValue<number, Actions>(myStateWithReducer);
+  
+  return ...
+};
+```
+
+另外 los 还提供了 `LosReducer` 类型帮助你单独声明 reducer 函数：
+
+```typescript
+const reducer: LosReducer<number, Actions> = (state, action) => { ... };
+```

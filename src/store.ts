@@ -14,11 +14,11 @@ export const store: Map<Atom<any, any>, StoreItem> = new Map();
 export type LosAction<T> = { type: T; [key: string]: any };
 export type LosReducer<S, A> = (state: S, action: LosAction<A>) => S;
 export class Atom<T, A = void> {
-  constructor(value: T, reducer?: LosReducer<T, A>) {
+  constructor(value?: T, reducer?: LosReducer<T, A>) {
     this.value = value;
     this.reducer = reducer;
   }
-  value: T;
+  value?: T;
   reducer?: LosReducer<T, A>;
 }
 
@@ -26,7 +26,7 @@ export const atom = <T, A = void>({
   defaultValue,
   reducer,
 }: {
-  defaultValue: T;
+  defaultValue?: T;
   reducer?: LosReducer<T, A>;
 }): Atom<T, A> => {
   const atomItem = new Atom(defaultValue, reducer);
