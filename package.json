@@ -5,7 +5,7 @@
     "name": "take_it_Izzy",
     "email": "q1367257497@gmail.com"
   },
-  "version": "0.3.2",
+  "version": "0.4.0",
   "keywords": ["react", "state", "manager", "management", "recoil", "store", "useContext"],
   "license": "MIT",
   "files": ["dist"],
