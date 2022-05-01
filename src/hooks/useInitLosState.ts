@@ -2,6 +2,7 @@ import { Atom, store } from '../store';
 import { SetLosState, useLosValue, useSetLosState } from './useLosState';
 import mergeStoreItem from '../utils/mergeStoreItem';
 import pushSubscribe from '../utils/pushSubscribe';
+import createSubscribe from '../utils/createSubscribe';
 
 export const initLosState = <T, A = void>(
   state: Atom<T, A>,
@@ -9,13 +10,17 @@ export const initLosState = <T, A = void>(
   allowReinitialize?: boolean
 ): void => {
   if (allowReinitialize) {
-    mergeStoreItem(state, { hasInit: true, value: defaultValue, stateBucket: new Map() });
+    mergeStoreItem(state, {
+      hasInit: true,
+      value: defaultValue,
+      subscribe: createSubscribe(store.get(state)!.stateBucket),
+    });
     pushSubscribe(state);
   } else if (!store.get(state)!.hasInit) {
     mergeStoreItem(state, {
       hasInit: true,
       value: defaultValue,
-      stateBucket: store.get(state)!.stateBucket ?? new Map(),
+      subscribe: store.get(state)!.subscribe ?? createSubscribe(store.get(state)!.stateBucket),
     });
     pushSubscribe(state);
   }

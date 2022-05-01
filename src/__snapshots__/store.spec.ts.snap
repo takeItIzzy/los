@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`atom() testing should exist current key in store when defaultValue and reducer are both provided: {
+      hasInit: false,
+      value: 'default',
+      reducer,
+      stateBucket: new Set(),
+      subscribe: [Function]
+    } 1`] = `
+Object {
+  "hasInit": false,
+  "reducer": [Function],
+  "stateBucket": Set {},
+  "subscribe": [Function],
+  "value": "default",
+}
+`;
+
+exports[`atom() testing should exist current key in store when defaultValue and reducer are neither provided: {
+      hasInit: false,
+      value: undefined,
+      reducer: undefined,
+      stateBucket: new Set(),
+      subscribe: [Function]
+    } 1`] = `
+Object {
+  "hasInit": false,
+  "reducer": undefined,
+  "stateBucket": Set {},
+  "subscribe": [Function],
+  "value": undefined,
+}
+`;
+
+exports[`atom() testing should exist current key in store when defaultValue is provided: {
+      hasInit: false,
+      value: 'default',
+      reducer: undefined,
+      stateBucket: new Set(),
+      subscribe: [Function]
+    } 1`] = `
+Object {
+  "hasInit": false,
+  "reducer": undefined,
+  "stateBucket": Set {},
+  "subscribe": [Function],
+  "value": "default",
+}
+`;
+
+exports[`atom() testing should exist current key in store when reducer is provided: {
+      hasInit: false,
+      value: undefined,
+      reducer,
+      stateBucket: new Set(),
+      subscribe: [Function]
+    } 1`] = `
+Object {
+  "hasInit": false,
+  "reducer": [Function],
+  "stateBucket": Set {},
+  "subscribe": [Function],
+  "value": undefined,
+}
+`;

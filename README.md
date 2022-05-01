@@ -160,7 +160,7 @@ const Foo = () => {
 如果你的状态无法在使用 `atom` 声明状态时确认，`useLosReducer` 还接受第二个参数，用于在调用 useLosReducer 时再初始化状态。在使用 `atom` 时不需要指定 `defaultValue`：
 
 ```js
-const stateWithoutDefault = atom({});
+const stateWithoutDefault = atom();
 
 const Foo = () => {
   const [state, dispatch] = useLosReducer(stateWithoutDefault, 0);

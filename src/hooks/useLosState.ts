@@ -5,18 +5,14 @@ import mergeStoreItem from '../utils/mergeStoreItem';
 import pushSubscribe from '../utils/pushSubscribe';
 
 export const useLosValue = <T, A = void>(atom: Atom<T, A>): T => {
-  const [id] = React.useState(Symbol());
-
-  React.useEffect(() => {
-    return () => {
-      store.get(atom)!.stateBucket!.delete(id);
-    };
-  });
-
-  return useSyncExternalStore(
-    (subscribeFn) => () => store.get(atom)!.stateBucket!.set(id, subscribeFn),
-    () => store.get(atom)!.value
+  const value = useSyncExternalStore(
+    store.get(atom)!.subscribe,
+    React.useCallback(() => store.get(atom)!.value, [atom])
   );
+
+  React.useDebugValue(value);
+
+  return value;
 };
 
 type SetStateFunction<T> = (state: T) => T;

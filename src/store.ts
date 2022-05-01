@@ -1,3 +1,5 @@
+import createSubscribe, { StateBucket, Subscribe } from './utils/createSubscribe';
+
 /**
  * Collecting state to store when useLosState or init/useLosInit is executing.
  * useLosValue triggers component re-rendering when state updated.
@@ -7,7 +9,8 @@ export interface StoreItem {
   hasInit: boolean;
   value: any;
   reducer?: LosReducer<any, any>;
-  stateBucket?: Map<symbol, () => void>;
+  stateBucket: StateBucket;
+  subscribe: Subscribe;
 }
 export const store: Map<Atom<any, any>, StoreItem> = new Map();
 
@@ -22,20 +25,22 @@ export class Atom<T, A = void> {
   reducer?: LosReducer<T, A>;
 }
 
-export const atom = <T, A = void>({
-  defaultValue,
-  reducer,
-}: {
-  defaultValue?: T;
-  reducer?: LosReducer<T, A>;
-}): Atom<T, A> => {
+export const atom = <T, A = void>(
+  config: {
+    defaultValue?: T;
+    reducer?: LosReducer<T, A>;
+  } = {}
+): Atom<T, A> => {
+  const { defaultValue, reducer } = config;
   const atomItem = new Atom(defaultValue, reducer);
 
+  const stateBucket: StateBucket = new Set();
   store.set(atomItem, {
     hasInit: false,
     value: atomItem.value,
     reducer: atomItem.reducer,
-    stateBucket: new Map(),
+    stateBucket,
+    subscribe: createSubscribe(stateBucket),
   });
 
   return atomItem;
