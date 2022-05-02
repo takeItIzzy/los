@@ -6,7 +6,7 @@ import { initLosState } from './useInitLosState';
 
 type LosDispatch<A> = (action: LosAction<A>) => void;
 
-export const useLosDispatch = <T, A = void>(state: Atom<T, A>): LosDispatch<A> => {
+export const losDispatch = <T, A = void>(state: Atom<T, A>): LosDispatch<A> => {
   return (action) => {
     const currentState = store.get(state);
     mergeStoreItem(state, {
@@ -17,6 +17,8 @@ export const useLosDispatch = <T, A = void>(state: Atom<T, A>): LosDispatch<A> =
     pushSubscribe(state);
   };
 };
+
+export const useLosDispatch = losDispatch;
 
 export const useLosReducer = <T, A = void>(
   state: Atom<T, A>,

@@ -20,7 +20,7 @@
 
 问题 1 可能会导致性能的下降，问题 2 和问题 3 则会给组件结构划分带来影响，开发者在设计组件时必须迁就 context 的运行逻辑。
 
-`los` 就是为了弥补 context 的这三点不足而诞生的状态管理工具。“los”的意思是“last one step”，它没有试图管理开发者所有的状态，而是仅作为 context 的替代品，将自己视为补全 react 项目技术栈的**最后一步**。los 解决了嵌套 provider 的问题，并且可以将状态与 react 组件脱钩，它具有 context 的优势——一次初始化，在任意位置调用 state，但更自由。
+`los` 就是为了弥补 context 的这三点不足而诞生的状态管理工具。“los”的意思是“last one step”，它没有试图管理开发者所有的状态，而是仅作为 context 的替代品，将自己视为补全 react 项目技术栈的**最后一步**。los 解决了嵌套 provider 的问题，并且可以将状态与 react 组件脱钩，这意味着你不需要总在组件顶层声明状态。它具有 context 的优势——一次初始化，在任意位置调用 state，但更自由。
 
 los 的原子化概念灵感来自 recoil，recoil 是个很好的状态管理库，但与 react-query 结合时的状态初始化略有不便，不适合我的工作场景，有些可惜。
 
@@ -126,7 +126,16 @@ const Foo = () => {
 };
 ```
 
-事实上，在 los 内部，`useLosState` 就是由 `useLosValue` 和 `useSetLosState` 组成的，`useLosState` 方法返回的就是 `[useLosValue(myState), useSetLosState(myState)]`。
+值得一提的是，`useLosValue` 是 **真正的** hooks，因为它内部依赖了 `useSyncExternalStore`，你在使用 `useLosValue` 时需要遵守一切 [hooks 的规则](https://reactjs.org/docs/hooks-rules.html)。但 `useSetLosState` 不是，它内部没有依赖任何 react 官方的 hooks，它其实更像一个普通的方法，以 `use` 开头更多的是为了在表现与使用形式上与 `useLosValue` 保持一致。尽管你可以无需遵守 hooks 的规则，比如直接在条件分支中使用 `useSetLosState`，但我不建议你这么做，这违背了 `useSetLosState` 以 `use` 为前缀的初衷，也容易为不明 `useSetLosState` 原理的其它代码维护者带来困扰，你在使用时还是应该把它视为真正的 hooks。但有时，类似“hooks 不能在分支语句中调用”这样的规则可能会制约代码的结构。所以，los 也提供了 `useSetLosState` 的一般方法版本，即 `setLosState`，它的行为与 `useSetLosState` 完全一致，但在违背 hooks 规则的地方使用时，不会有违和感：
+
+```js
+if (condition) {
+  const setState = setLosState(myState);
+  setState('new value');
+}
+```
+
+事实上，在 los 内部，`useLosState` 就是由 `useLosValue` 和 `setLosState` 组成的，`useLosState` 方法返回的就是 `[useLosValue(myState), setLosState(myState)]`。这也意味着，`useLosState` 也是 **真正的** hooks，你在使用 `useLosState` 时也需要遵守一切 hooks 的规则。
 
 ### useLosReducer
 
@@ -191,6 +200,15 @@ const Foo = () => {
 };
 ```
 
+与 `useSetLosState` 类似，`useLosDispatch` 也并不是真正的 hooks，你可以在违反 hooks 规则的地方使用它，但为了使语义更明确，你不应该这么做。如果你确实需要如此，使用 `useLosDispatch` 的一般方法版本：
+
+```js
+if (condition) {
+  const dispatch = losDispatch(myState);
+  dispatch({ type: 'INCREMENT' });
+}
+```
+
 ### initLosState & useInitLosState
 
 如果你的状态默认值不依赖于网络请求等场景，使用 atom 就初始化好了一个原子状态了，但如果你的默认值在未来某个时间才确定，你可以在需要的时候调用 `initLosState`：
@@ -214,8 +232,11 @@ initLosState(myState, defaultValue, true);
 initLosState 也提供了对应的 hooks，这在你想将数据的初始化隔离到特定组件或自定义 hooks 中时很有用。`useInitLosState` 行为类似 `useState`，接受默认值，并返回状态与改变状态的 setter 方法：
 
 ```js
-function Foo({ defaultValue }) {
+function Form({ defaultValue }) {
+  // the default value for the form cannot be determined until the network request gets response.
   const [state, setState] = useInitLosState(myState, defaultValue);
+  
+  return ...
 };
 ```
 
@@ -227,7 +248,7 @@ function Foo({ defaultValue }) {
 const Foo = () => {
   const state = useLosValue(myState);
   
-  if (state == undefined) { // `==` will determine whether it is nil
+  if (state === undefined) {
     return <Loader />
   }
   
@@ -235,7 +256,7 @@ const Foo = () => {
 };
 ```
 
-注意：initLosState 和 useInitLosState 并不是必要的，如果你的初始状态在使用 atom 生成原子状态时就可以确定，那就不需要使用它俩。
+`initLosState` 和 `useInitLosState` 并不是必要的，如果你的初始状态在使用 `atom` 生成原子状态时就可以确定，那就不需要使用它俩。
 
 ### TypeScript
 

@@ -17,7 +17,7 @@ export const useLosValue = <T, A = void>(atom: Atom<T, A>): T => {
 
 type SetStateFunction<T> = (state: T) => T;
 export type SetLosState<T> = (state: T | SetStateFunction<T>) => void;
-export const useSetLosState = <T, A = void>(atom: Atom<T, A>): SetLosState<T> => {
+export const setLosState = <T, A = void>(atom: Atom<T, A>): SetLosState<T> => {
   return (state: T | SetStateFunction<T>) => {
     mergeStoreItem(atom, {
       // now that we start updating state, we can confirm that the atom has been initialized
@@ -30,6 +30,8 @@ export const useSetLosState = <T, A = void>(atom: Atom<T, A>): SetLosState<T> =>
   };
 };
 
+export const useSetLosState = setLosState;
+
 export const useLosState = <T, A = void>(atom: Atom<T, A>): [T, SetLosState<T>] => {
-  return [useLosValue(atom), useSetLosState(atom)];
+  return [useLosValue(atom), setLosState(atom)];
 };
