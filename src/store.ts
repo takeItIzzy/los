@@ -45,3 +45,37 @@ export const atom = <T, A = void>(
 
   return atomItem;
 };
+
+interface ComputedConfig {
+  get: <T, A>(atom: Atom<T, A>) => T;
+}
+export class Computed<Derive> {
+  constructor(
+    getter: ({ get }: ComputedConfig) => Derive,
+    setter?: (config: ComputedConfig) => void
+  ) {
+    this.getter = getter;
+    this.setter = setter;
+    this.originAtoms = new Set<Atom<any, any>>();
+    this.stateProvider = this.stateProvider.bind(this);
+  }
+  getter: (config: ComputedConfig) => Derive;
+  setter?: (config: ComputedConfig) => void;
+  originAtoms: Set<Atom<any, any>>;
+  stateProvider<T, A>(atom: Atom<T, A>): T {
+    this.originAtoms.add(atom);
+    return store.get(atom)!.value;
+  }
+  get value() {
+    return this.getter({ get: this.stateProvider });
+  }
+}
+
+export const computed = <Derive>(config: {
+  get: (config: ComputedConfig) => Derive;
+  set?: (config: ComputedConfig) => void;
+}): Computed<Derive> => {
+  const { get, set } = config;
+
+  return new Computed<Derive>(get, set);
+};

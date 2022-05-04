@@ -1,4 +1,4 @@
-export { atom } from './store';
+export { atom, computed } from './store';
 
 export { useLosValue, useSetLosState, useLosState, setLosState } from './hooks/useLosState';
 

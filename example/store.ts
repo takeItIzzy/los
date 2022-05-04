@@ -1,4 +1,4 @@
-import { atom, LosReducer } from '../src';
+import { atom, computed, LosReducer } from '../src';
 
 type ActionType = 'INCREMENT' | 'DECREMENT';
 const reducer: LosReducer<number, ActionType> = (state, action) => {
@@ -14,4 +14,10 @@ const reducer: LosReducer<number, ActionType> = (state, action) => {
 export const state = atom({
   defaultValue: 0,
   reducer,
+});
+
+export const computedState = computed({
+  get: ({ get }) => {
+    return get(state) + 1;
+  },
 });
