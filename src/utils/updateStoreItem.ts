@@ -1,10 +1,14 @@
 import mergeStoreItem from './mergeStoreItem';
 import pushSubscribe from './pushSubscribe';
-import { Atom, StoreItem } from '../store';
+import { Atom, store, StoreItem } from '../store';
 
 const updateStoreItem = <T, A = void>(state: Atom<T, A>, newItem: Partial<StoreItem>) => {
-  mergeStoreItem(state, newItem);
-  pushSubscribe(state);
+  const { value } = newItem;
+
+  if (!Object.is(value, store.get(state)!.value)) {
+    mergeStoreItem(state, newItem);
+    pushSubscribe(state);
+  }
 };
 
 export default updateStoreItem;
