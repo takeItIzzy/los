@@ -3,10 +3,12 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { Atom, Computed, store } from '../store';
 import { Subscribe } from '../utils/createSubscribe';
 import updateStoreItem from '../utils/updateStoreItem';
+import { __DEV__ } from '../constants';
+import { error } from '../utils/warn';
 
 export const useLosValue = <T, A = void>(state: Atom<T, A> | Computed<T>): T => {
-  if (!(state instanceof Atom) && !(state instanceof Computed)) {
-    throw new Error('useLosValue: state must be an Atom or a Computed');
+  if (__DEV__ && !(state instanceof Atom) && !(state instanceof Computed)) {
+    error('useLosValue: state must be an Atom or a Computed');
   }
 
   let subscribe: Subscribe;
@@ -44,8 +46,8 @@ export const useLosValue = <T, A = void>(state: Atom<T, A> | Computed<T>): T => 
 type SetStateFunction<T> = (state: T) => T;
 export type SetLosState<T> = (state: T | SetStateFunction<T>) => void;
 export const setLosState = <T, A = void>(state: Atom<T, A> | Computed<T>): SetLosState<T> => {
-  if (!(state instanceof Atom) && !(state instanceof Computed)) {
-    throw new Error('setLosState: state must be an Atom or a Computed');
+  if (__DEV__ && !(state instanceof Atom) && !(state instanceof Computed)) {
+    error('setLosState: state must be an Atom or a Computed');
   }
 
   let update: SetLosState<T>;

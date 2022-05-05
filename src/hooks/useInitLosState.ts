@@ -1,14 +1,16 @@
 import { Atom, Computed, store } from '../store';
 import { SetLosState, useLosValue, useSetLosState } from './useLosState';
 import updateStoreItem from '../utils/updateStoreItem';
+import { __DEV__ } from '../constants';
+import { error } from '../utils/warn';
 
 export const initLosState = <T, A = void>(
   state: Atom<T, A> | Computed<T>,
   defaultValue: T,
   allowReinitialize?: boolean
 ): void => {
-  if (!(state instanceof Atom) && !(state instanceof Computed)) {
-    throw new Error('initLosState: state must be an Atom or a Computed');
+  if (__DEV__ && !(state instanceof Atom) && !(state instanceof Computed)) {
+    error('initLosState: state must be an Atom or a Computed');
   }
 
   if (state instanceof Atom) {

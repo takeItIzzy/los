@@ -2,12 +2,14 @@ import { Atom, LosAction, store } from '../store';
 import { useLosValue } from './useLosState';
 import { initLosState } from './useInitLosState';
 import updateStoreItem from '../utils/updateStoreItem';
+import { __DEV__ } from '../constants';
+import { error } from '../utils/warn';
 
 type LosDispatch<A> = (action: LosAction<A>) => void;
 
 export const losDispatch = <T, A = void>(state: Atom<T, A>): LosDispatch<A> => {
-  if (!(state instanceof Atom)) {
-    throw new Error('losDispatch: state must be an Atom');
+  if (__DEV__ && !(state instanceof Atom)) {
+    error('losDispatch: state must be an Atom');
   }
   return (action) => {
     const currentState = store.get(state);

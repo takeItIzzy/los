@@ -1,4 +1,6 @@
 import createSubscribe, { StateBucket, Subscribe } from './utils/createSubscribe';
+import { __DEV__ } from './constants';
+import { error } from './utils/warn';
 
 /**
  * Collecting state to store when useLosState or init/useLosInit is executing.
@@ -80,6 +82,10 @@ type ComputedConfig<Derive> = {
 };
 export const computed = <Derive>(config: ComputedConfig<Derive>): Computed<Derive> => {
   const { get, set } = config;
+
+  if (__DEV__ && !get) {
+    error('computed: a Computed must have a get method.');
+  }
 
   return new Computed(get, set);
 };
