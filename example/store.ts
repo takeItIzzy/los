@@ -20,4 +20,7 @@ export const computedState = computed({
   get: ({ get }) => {
     return get(state) + 1;
   },
+  set: ({ set }, newValue) => {
+    set(state, newValue - 1);
+  },
 });

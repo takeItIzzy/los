@@ -240,6 +240,64 @@ function Form({ defaultValue }) {
 };
 ```
 
+### computed
+
+`computed` 类似 vue 的 `[计算属性](https://vuejs.org/api/reactivity-core.html#computed)` 或 recoil 的 `[selector](https://recoiljs.org/docs/api-reference/core/selector)` 的概念，语法也与 recoil 的 selector 类似。
+
+#### 只读的 computed
+
+你可以为 computed 传入一个含有 `get` 方法的对象，表示这是一个只读的 computed。get 方法返回值即作为 computed 的值。
+
+```js
+const atomState = atom({ defaultValue: 1 });
+const computedState = computed({
+  get: ({ get }) => {
+    const atomValue = get(atomState); // get 方法的作用与 useLosValue 类似，传入一个 atom，获得其当前值
+    return atomValue + 1;
+  }
+})
+```
+
+只有 `useLosState` 和 `useInitLosState` 及它俩的衍生方法或 hooks 可以接受 computed 作为参数，`useLosReducer`、`useLosDispatch`、`losDispatch` 则不行：
+
+```js
+const Foo = () => {
+  const state = useLosValue(computedState);
+  
+  // 当 atom 的值是 1 时，computed 的值时 2
+  return <div>computed: {state}</div>
+}
+```
+
+#### 可写的 computed
+
+computed 的入参对象还可以接受 `set` 方法，当传入这个方法时，可以通过 computed 改变 atom 的值：
+
+```js
+const atomState = atom({ defaultValue: 1 });
+const computedState = computed({
+  get: ({ get }) => {
+    const atomValue = get(atomState);
+    return atomValue + 1;
+  },
+  set: ({ get, set }, newValue) => {
+    set(atomState, newValue - 2); // set 方法作用与 useSetLosState 类似，用来改变 atom 的值；newValue 即为在组件中调用时传入的值
+  }
+})
+
+const Foo = () => {
+  const [state, setState] = useLosState(atomState);
+  
+  // 点击 button 后，set 的 newValue 值为 5，所以 atom 被设置为 3，而 computed 在 get 中被声明为 4，所以 div 应该展示 `computed: 4`
+  return (
+    <>
+      <div>computed: {state}</div>
+      <button onClick={() => setState(5)}>Click me</button>
+    </>
+  )
+}
+```
+
 #### 未初始化时数据的表现形式
 
 当一个状态还没有初始化完成时，其返回的状态也是 `atom` 中的 `defaultValue`，如果这时你没有设置 defaultValue，那 los 将返回 undefined：

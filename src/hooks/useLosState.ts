@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { Atom, Computed, store } from '../store';
-import mergeStoreItem from '../utils/mergeStoreItem';
-import pushSubscribe from '../utils/pushSubscribe';
 import { Subscribe } from '../utils/createSubscribe';
+import updateStoreItem from '../utils/updateStoreItem';
 
 export const useLosValue = <T, A = void>(state: Atom<T, A> | Computed<T>): T => {
   if (!(state instanceof Atom) && !(state instanceof Computed)) {
@@ -45,21 +44,46 @@ export const useLosValue = <T, A = void>(state: Atom<T, A> | Computed<T>): T => 
 type SetStateFunction<T> = (state: T) => T;
 export type SetLosState<T> = (state: T | SetStateFunction<T>) => void;
 export const setLosState = <T, A = void>(state: Atom<T, A> | Computed<T>): SetLosState<T> => {
-  // todo support Computed
-  return (newState: T | SetStateFunction<T>) => {
-    mergeStoreItem(state, {
-      // now that we start updating state, we can confirm that the atom has been initialized
-      hasInit: true,
-      // @ts-ignore
-      value: typeof newState === 'function' ? newState(store.get(state)!.value) : newState,
-    });
+  if (!(state instanceof Atom) && !(state instanceof Computed)) {
+    throw new Error('setLosState: state must be an Atom or a Computed');
+  }
 
-    pushSubscribe(state);
-  };
+  let update: SetLosState<T>;
+  if (state instanceof Atom) {
+    update = (newState: T | SetStateFunction<T>) => {
+      updateStoreItem(state, {
+        // now that we start updating state, we can confirm that the atom has been initialized
+        hasInit: true,
+        // @ts-ignore
+        value: typeof newState === 'function' ? newState(store.get(state)!.value) : newState,
+      });
+    };
+  } else {
+    const { setter, stateProvider } = state;
+    update = (newState: T | SetStateFunction<T>) => {
+      // @ts-ignore
+      const newValue = typeof newState === 'function' ? newState(state.value) : newState;
+      setter?.(
+        {
+          get: stateProvider,
+          set: (atom, value) => {
+            updateStoreItem(atom, {
+              // now that we start updating state, we can confirm that the atom has been initialized
+              hasInit: true,
+              value,
+            });
+          },
+        },
+        newValue
+      );
+    };
+  }
+
+  return update;
 };
 
 export const useSetLosState = setLosState;
 
-export const useLosState = <T, A = void>(atom: Atom<T, A>): [T, SetLosState<T>] => {
-  return [useLosValue(atom), setLosState(atom)];
+export const useLosState = <T, A = void>(state: Atom<T, A> | Computed<T>): [T, SetLosState<T>] => {
+  return [useLosValue(state), setLosState(state)];
 };
