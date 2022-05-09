@@ -24,3 +24,6 @@ export const computedState = computed({
     set(state, newValue - 1);
   },
 });
+
+export const uncachedState = atom({ defaultValue: 0, cached: false });
+export const cachedState = atom({ defaultValue: 0 });

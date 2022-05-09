@@ -3,11 +3,13 @@
 exports[`atom() testing should exist current key in store when defaultValue and reducer are both provided: {
       hasInit: false,
       value: 'default',
-      reducer,
+      reducer: [Function],
+      cached: true,
       stateBucket: new Set(),
       subscribe: [Function]
     } 1`] = `
 Object {
+  "cached": true,
   "hasInit": false,
   "reducer": [Function],
   "stateBucket": Set {},
@@ -20,10 +22,12 @@ exports[`atom() testing should exist current key in store when defaultValue and 
       hasInit: false,
       value: undefined,
       reducer: undefined,
+      cached: true,
       stateBucket: new Set(),
       subscribe: [Function]
     } 1`] = `
 Object {
+  "cached": true,
   "hasInit": false,
   "reducer": undefined,
   "stateBucket": Set {},
@@ -36,10 +40,12 @@ exports[`atom() testing should exist current key in store when defaultValue is p
       hasInit: false,
       value: 'default',
       reducer: undefined,
+      cached: true,
       stateBucket: new Set(),
       subscribe: [Function]
     } 1`] = `
 Object {
+  "cached": true,
   "hasInit": false,
   "reducer": undefined,
   "stateBucket": Set {},
@@ -51,11 +57,13 @@ Object {
 exports[`atom() testing should exist current key in store when reducer is provided: {
       hasInit: false,
       value: undefined,
-      reducer,
+      reducer: [Function],
+      cached: true,
       stateBucket: new Set(),
       subscribe: [Function]
     } 1`] = `
 Object {
+  "cached": true,
   "hasInit": false,
   "reducer": [Function],
   "stateBucket": Set {},

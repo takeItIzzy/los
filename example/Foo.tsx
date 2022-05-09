@@ -1,18 +1,28 @@
 import * as React from 'react';
-import { useSetLosState } from '../src';
-import { state } from './store';
+import { useLosState } from '../src';
+import { uncachedState, cachedState } from './store';
 
 const Foo = () => {
-  const setState = useSetLosState(state);
+  const [state, setState] = useLosState(uncachedState);
+  const [state2, setState2] = useLosState(cachedState);
 
   return (
-    <div
-      onClick={() => {
-        setState(3);
-      }}
-    >
-      child
-    </div>
+    <>
+      <div
+        onClick={() => {
+          setState(3);
+        }}
+      >
+        uncached: {state}
+      </div>
+      <div
+        onClick={() => {
+          setState2(3);
+        }}
+      >
+        cached: {state2}
+      </div>
+    </>
   );
 };
 

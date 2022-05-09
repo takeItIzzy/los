@@ -7,7 +7,7 @@ import * as React from 'react';
 const App = () => {
   const [myState, dispatch] = useLosReducer(state);
   const [com, setCom] = useLosState(computedState);
-  const [myState2, setMyState2] = React.useState(0);
+  const [showFoo, setShowFoo] = React.useState(true);
 
   React.useEffect(() => {
     console.log('re-render', myState);
@@ -20,8 +20,8 @@ const App = () => {
         <span onClick={() => setCom(100)}>{com}</span>
       </div>
       <div onClick={() => dispatch({ type: 'INCREMENT' })}>{myState}</div>
-      <div onClick={() => setMyState2(5)}>{myState2}</div>
-      <Foo />
+      <button onClick={() => setShowFoo((prev) => !prev)}>toggle Foo</button>
+      {showFoo && <Foo />}
       <Boo />
     </div>
   );

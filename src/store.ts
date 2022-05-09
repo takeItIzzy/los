@@ -11,6 +11,7 @@ export interface StoreItem {
   hasInit: boolean;
   value: any;
   reducer?: LosReducer<any, any>;
+  cached?: boolean;
   stateBucket: StateBucket;
   subscribe: Subscribe;
 }
@@ -19,30 +20,34 @@ export const store: Map<Atom<any, any>, StoreItem> = new Map();
 export type LosAction<T> = { type: T; [key: string]: any };
 export type LosReducer<S, A> = (state: S, action: LosAction<A>) => S;
 export class Atom<T, A = void> {
-  constructor(value?: T, reducer?: LosReducer<T, A>) {
+  constructor(value?: T, reducer?: LosReducer<T, A>, cached?: boolean) {
     this.value = value;
     this.reducer = reducer;
+    this.cached = cached;
   }
   value?: T;
   reducer?: LosReducer<T, A>;
+  cached?: boolean;
 }
 
 export const atom = <T, A = void>(
   config: {
     defaultValue?: T;
     reducer?: LosReducer<T, A>;
+    cached?: boolean;
   } = {}
 ): Atom<T, A> => {
-  const { defaultValue, reducer } = config;
-  const atomItem = new Atom(defaultValue, reducer);
+  const { defaultValue, reducer, cached = true } = config;
+  const atomItem = new Atom(defaultValue, reducer, cached);
 
   const stateBucket: StateBucket = new Set();
   store.set(atomItem, {
     hasInit: false,
     value: atomItem.value,
     reducer: atomItem.reducer,
+    cached,
     stateBucket,
-    subscribe: createSubscribe(stateBucket),
+    subscribe: createSubscribe(stateBucket, atomItem),
   });
 
   return atomItem;
