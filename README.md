@@ -242,7 +242,7 @@ function Form({ defaultValue }) {
 
 ### computed
 
-`computed` 类似 vue 的 `[计算属性](https://vuejs.org/api/reactivity-core.html#computed)` 或 recoil 的 `[selector](https://recoiljs.org/docs/api-reference/core/selector)` 的概念，语法也与 recoil 的 selector 类似。
+`computed` 类似 vue 的 [`计算属性`](https://vuejs.org/api/reactivity-core.html#computed) 或 recoil 的 [`selector`](https://recoiljs.org/docs/api-reference/core/selector) 的概念，语法也与 recoil 的 selector 类似。
 
 #### 只读的 computed
 
@@ -264,7 +264,7 @@ const computedState = computed({
 const Foo = () => {
   const state = useLosValue(computedState);
   
-  // 当 atom 的值是 1 时，computed 的值时 2
+  // 当 atom 的值是 1 时，computed 的值是 2
   return <div>computed: {state}</div>
 }
 ```
@@ -286,7 +286,7 @@ const computedState = computed({
 })
 
 const Foo = () => {
-  const [state, setState] = useLosState(atomState);
+  const [state, setState] = useLosState(computedState);
   
   // 点击 button 后，set 的 newValue 值为 5，所以 atom 被设置为 3，而 computed 在 get 中被声明为 4，所以 div 应该展示 `computed: 4`
   return (
