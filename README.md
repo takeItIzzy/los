@@ -65,6 +65,7 @@ const Foo = () => {
 {
   defaultValue?: T;
   reducer?: LosReducer<T, A>;
+  cached?: boolean;
 }
 ```
 
@@ -85,6 +86,14 @@ const myState = atom({
 ```
 
 los 认为一个状态的改变途径可以在声明该状态时就确定，所以将 reducer 放在了 atom 中。
+
+los 的目标之一是可以取代 context 在代码中的使用，但现在一个原子状态一旦被注册，没有办法被注销，这与 context 不同—当承载 provider 的组件销毁时，context 也会跟着注销。可能带来的问题是，有的时候开发者希望每次打开一个页面，都能加载状态的初始值，而 los 依然保留着上一次的最新值。
+
+所以 los 允许在注册 atom 时传入第三个属性——cached，决定该 atom 是否是持久化的，该属性默认为 `true`，如果设置为 `false`，los 会在全局没有任何组件应用该 atom 时重置 atom。
+
+```js
+const uncachedAtom = atom({ default: 0, cached: false });
+```
 
 ### useLosState
 
