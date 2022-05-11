@@ -21,20 +21,8 @@ export const initLosState = <T, A = void>(
       });
     }
   } else {
-    const { setter, stateProvider } = state;
     if (allowReinitialize || !store.get(state)!.hasInit) {
-      setter?.(
-        {
-          get: stateProvider,
-          set: (atom, value) => {
-            updateStoreItem(atom, {
-              hasInit: true,
-              value,
-            });
-          },
-        },
-        defaultValue
-      );
+      state.value = defaultValue;
     }
   }
 };

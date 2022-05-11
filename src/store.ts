@@ -1,6 +1,7 @@
 import createSubscribe, { StateBucket, Subscribe } from './utils/createSubscribe';
 import { __DEV__ } from './constants';
 import { error } from './utils/warn';
+import updateStoreItem from './utils/updateStoreItem';
 
 /**
  * Collecting state to store when useLosState or init/useLosInit is executing.
@@ -25,9 +26,9 @@ export class Atom<T, A = void> {
     this.reducer = reducer;
     this.cached = cached;
   }
-  value?: T;
-  reducer?: LosReducer<T, A>;
-  cached?: boolean;
+  readonly value?: T;
+  readonly reducer?: LosReducer<T, A>;
+  readonly cached?: boolean;
 }
 
 export const atom = <T, A = void>(
@@ -69,15 +70,30 @@ export class Computed<Derive> {
     this.originAtoms = new Set<Atom<any, any>>();
     this.stateProvider = this.stateProvider.bind(this);
   }
-  getter: (config: ComputedGetMethods) => Derive;
-  setter?: (config: ComputedSetMethods, newValue: Derive) => void;
-  originAtoms: Set<Atom<any, any>>;
+  readonly getter: (config: ComputedGetMethods) => Derive;
+  readonly setter?: (config: ComputedSetMethods, newValue: Derive) => void;
+  readonly originAtoms: Set<Atom<any, any>>;
   stateProvider<T, A>(atom: Atom<T, A>): T {
     this.originAtoms.add(atom);
     return store.get(atom)!.value;
   }
   get value() {
     return this.getter({ get: this.stateProvider });
+  }
+  set value(newValue: Derive) {
+    this.setter?.(
+      {
+        get: this.stateProvider,
+        set: (atom, value) => {
+          updateStoreItem(atom, {
+            // now that we start updating state, we can confirm that the atom has been initialized
+            hasInit: true,
+            value,
+          });
+        },
+      },
+      newValue
+    );
   }
 }
 

@@ -61,23 +61,9 @@ export const setLosState = <T, A = void>(state: Atom<T, A> | Computed<T>): SetLo
       });
     };
   } else {
-    const { setter, stateProvider } = state;
     update = (newState: T | SetStateFunction<T>) => {
       // @ts-ignore
-      const newValue = typeof newState === 'function' ? newState(state.value) : newState;
-      setter?.(
-        {
-          get: stateProvider,
-          set: (atom, value) => {
-            updateStoreItem(atom, {
-              // now that we start updating state, we can confirm that the atom has been initialized
-              hasInit: true,
-              value,
-            });
-          },
-        },
-        newValue
-      );
+      state.value = typeof newState === 'function' ? newState(state.value) : newState;
     };
   }
 
