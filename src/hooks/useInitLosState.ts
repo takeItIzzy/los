@@ -3,6 +3,7 @@ import { SetLosState, useLosValue, useSetLosState } from './useLosState';
 import updateStoreItem from '../utils/updateStoreItem';
 import { __DEV__ } from '../constants';
 import { error } from '../utils/warn';
+import * as React from 'react';
 
 export const initLosState = <T, A = void>(
   state: Atom<T, A> | Computed<T>,
@@ -34,5 +35,9 @@ export const useInitLosState = <T, A = void>(
 ): [T, SetLosState<T>] => {
   initLosState(atom, defaultValue, allowReinitialize);
 
-  return [useLosValue(atom), useSetLosState(atom)];
+  const value = useLosValue(atom);
+
+  React.useDebugValue(value);
+
+  return [value, useSetLosState(atom)];
 };

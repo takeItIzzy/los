@@ -4,6 +4,7 @@ import { initLosState } from './useInitLosState';
 import updateStoreItem from '../utils/updateStoreItem';
 import { __DEV__ } from '../constants';
 import { error } from '../utils/warn';
+import * as React from 'react';
 
 type LosDispatch<A> = (action: LosAction<A>) => void;
 
@@ -30,5 +31,9 @@ export const useLosReducer = <T, A = void>(
 ): [T, LosDispatch<A>] => {
   !!initStateValue && initLosState(state, initStateValue, allowReinitialize);
 
-  return [useLosValue(state), useLosDispatch(state)];
+  const value = useLosValue(state);
+
+  React.useDebugValue(value);
+
+  return [value, useLosDispatch(state)];
 };

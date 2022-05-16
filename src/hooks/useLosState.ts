@@ -73,5 +73,9 @@ export const setLosState = <T, A = void>(state: Atom<T, A> | Computed<T>): SetLo
 export const useSetLosState = setLosState;
 
 export const useLosState = <T, A = void>(state: Atom<T, A> | Computed<T>): [T, SetLosState<T>] => {
-  return [useLosValue(state), setLosState(state)];
+  const value = useLosValue(state);
+
+  React.useDebugValue(value);
+
+  return [value, setLosState(state)];
 };
