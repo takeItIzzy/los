@@ -2,6 +2,51 @@
 
 一个原子化的状态管理工具。
 
+## Concurrent Mode 兼容性
+
+测试用例来自 [Will this React global state work in concurrent rendering?](https://github.com/dai-shi/will-this-react-global-state-work-in-concurrent-rendering)
+
+<details>
+<summary>Raw Output</summary>
+
+```
+With useTransition                                                                                                                        
+  Level 1                                                                                                                                 
+    √ No tearing finally on update (8817 ms)                                                                                              
+    √ No tearing finally on mount (4828 ms)                                                                                               
+  Level 2                                                                                                                                 
+    √ No tearing temporarily on update (13193 ms)                                                                                         
+    √ No tearing temporarily on mount (4650 ms)                                                                                           
+  Level 3                                                                                                                                 
+    × Can interrupt render (time slicing) (8362 ms)                                                                                       
+    × Can branch state (wip state) (6974 ms)                                                                                              
+With useDeferredValue                                                                                                                     
+  Level 1                                                                                                                                 
+    √ No tearing finally on update (10088 ms)                                                                                             
+    √ No tearing finally on mount (5167 ms)                                                                                               
+  Level 2                                                                                                                                 
+    × No tearing temporarily on update (21284 ms)                                                                                         
+    √ No tearing temporarily on mount (6503 ms)
+```
+</details>
+
+<table>
+<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+	<tr>
+		<td>:white_check_mark:</td>
+		<td>:white_check_mark:</td>
+		<td>:white_check_mark:</td>
+		<td>:white_check_mark:</td>
+		<td>:x:</td>
+		<td>:x:</td>
+		<td>:white_check_mark:</td>
+		<td>:white_check_mark:</td>
+		<td>:x:</td>
+		<td>:white_check_mark:</td>
+	</tr>
+
+</table>
+
 ## 动机
 
 现今社区中的状态管理库，大都希望自己能管理开发者项目中的所有状态，包括异步数据和前端状态。所以他们大多也都提供了对异步的支持以将网络请求的结果存入状态管理器中。
